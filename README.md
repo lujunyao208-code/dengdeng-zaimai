@@ -54,7 +54,7 @@ npx serve .
 
 ```
 index.html            应用外壳（底部导航 / 弹出层容器）
-css/styles.css        设计系统：韩系 ins 风 —— 淡黄底 + 白卡片 + 黑/棕文字（375×812，Apple 系统字体，无网络字体）
+css/styles.css        设计系统：Brewwww! 手帐印章风 —— 牛皮纸奶油底 + 奶油卡片 + 焦糖金/陶土点缀 + 虚线票券边 + 像素标题字体（375×812；正文 Apple 系统字体栈，标题/数字用本地像素字体 assets/fonts/zpix.ttf，无网络字体）
 js/config.js          业务规则配置 + 计算函数（改规则只动这里）
 js/store.js           数据层：localStorage 读写、数据模型、统计推导、决策操作
 js/ocr.js             商品识别服务（Mock 实现 + 真实 API 接入点）

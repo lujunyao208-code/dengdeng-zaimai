@@ -10,15 +10,12 @@
  * ============================================================
  */
 window.Pages = window.Pages || {};
-
 Pages.profile = (function () {
-
   function render(root) {
     var user = Store.getUser();
     var s = Store.computeStats();
     root.innerHTML = '<div class="page"></div>';
     var page = root.firstChild;
-
     var html =
       '<header class="profile-head">' +
         '<span class="avatar" data-avatar="' + UI.esc(user.avatar) + '">' + avatarContent(user) + '</span>' +
@@ -28,8 +25,6 @@ Pages.profile = (function () {
           '<button class="btn-mini ph-edit" data-act="edit"><span class="ico">' + Icons.pencil + '</span>编辑资料</button>' +
         '</div>' +
       '</header>' +
-
-      // 两个核心数据卡片（没花的钱 = 已省下的钱，只保留一个；视觉与其他模块统一）
       '<div class="stats-grid">' +
         '<div class="paper stat-card sc-spent">' +
           '<div class="sc-label">已花费</div>' +
@@ -41,8 +36,6 @@ Pages.profile = (function () {
           '<div class="sc-sub">因为多想了一下，省下了一笔不必要的支出</div>' +
         '</div>' +
       '</div>' +
-
-      // 冷静记录
       '<div class="paper" style="margin-bottom:14px;">' +
         '<div class="card-title"><span class="ico">' + Icons.clock + '</span>我的冷静记录</div>' +
         '<div class="record-grid">' +
@@ -53,24 +46,17 @@ Pages.profile = (function () {
           rgItem(s.abandonedCount, '件', '最终放弃') +
         '</div>' +
       '</div>' +
-
-      // 消费偏好（简单版）
       prefHTML(s) +
-
-      // 设置（V1.1：删除通知设置；冷静期偏好与账号与安全都做成可用页面）
       '<div class="paper" style="margin-bottom:14px;">' +
         '<div class="card-title"><span class="ico">' + Icons.gear + '</span>设置</div>' +
         setRow('hourglass', '冷静期偏好', 'cooling') +
         setRow('lock', '账号与安全', 'account') +
         setRow('info', '关于「' + CONFIG.APP_NAME + '」', 'about') +
       '</div>' +
-
-      '<p class="app-footer">' + CONFIG.APP_NAME + ' v1.0 MVP<br>喜欢它没关系，先不用马上拥有它。</p>';
-
+      '<p class="app-footer">' + CONFIG.APP_NAME + ' v2.0<br>喜欢它没关系，先不用马上拥有它。</p>';
     page.innerHTML = html;
     bind(page, user);
   }
-
   function rgItem(value, unit, label) {
     return (
       '<div class="rg-item">' +
@@ -79,13 +65,10 @@ Pages.profile = (function () {
       '</div>'
     );
   }
-
-  /** 天数：整数不带小数，非整数保留 1 位 */
   function fmtDays(d) {
     var v = Number(d || 0);
     return Number.isInteger(v) ? v : v.toFixed(1);
   }
-
   function prefHTML(s) {
     var rows;
     if (!s.categoryList.length) {
@@ -109,7 +92,6 @@ Pages.profile = (function () {
       '</div>'
     );
   }
-
   function setRow(icon, label, key) {
     return (
       '<button class="set-row" data-set="' + key + '">' +
@@ -118,10 +100,8 @@ Pages.profile = (function () {
       '</button>'
     );
   }
-
   function bind(page, user) {
     page.addEventListener('click', function (e) {
-      // V1.2：头像上传入口统一放在「编辑资料」页面，点头像不再直接弹上传
       if (e.target.closest('[data-act="edit"]')) {
         location.hash = '#/settings/profile';
         return;
@@ -134,17 +114,12 @@ Pages.profile = (function () {
       else if (key === 'account') location.hash = '#/settings/account';
     });
   }
-
-  /** 头像内容：自上传图片优先，否则默认线稿图标 */
   function avatarContent(user) {
     if (user.avatarImage) {
       return '<img src="' + user.avatarImage + '" alt="头像">';
     }
     return Icons.get(user.avatar);
   }
-
-  /* 编辑资料改为独立页面（#/settings/profile），见 js/pages/settings.js */
-
   /* ============================================================
    * 关于页（含开发调试工具）
    * ========================================================== */
@@ -160,7 +135,7 @@ Pages.profile = (function () {
         '<div class="about-logo">' +
           '<div class="al-emoji ico">' + Icons.flower + '</div>' +
           '<div class="al-name">' + CONFIG.APP_NAME + '</div>' +
-          '<div class="al-tag">v1.0 MVP · 消费决策辅助工具</div>' +
+          '<div class="al-tag">v2.0 · 消费决策辅助工具</div>' +
         '</div>' +
         '<div class="paper" style="margin:16px 0 14px;">' +
           '<div class="card-title"><span class="ico">' + Icons.heart + '</span>我们想做什么</div>' +
@@ -204,6 +179,5 @@ Pages.profile = (function () {
       });
     },
   };
-
   return { render: render, avatarContent: avatarContent };
 })();

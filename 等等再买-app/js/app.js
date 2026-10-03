@@ -14,10 +14,8 @@
  * ============================================================
  */
 window.App = (function () {
-
   var appEl;
   var currentRoute = null;
-
   function parseHash() {
     var h = location.hash.replace(/^#\/?/, '');
     var parts = h.split('/').filter(Boolean);
@@ -30,35 +28,26 @@ window.App = (function () {
     if (parts[0] === 'profile') return { name: 'profile' };
     return { name: 'items' };
   }
-
   function render(animate) {
     var route = parseHash();
     currentRoute = route;
-
-    // 静默刷新（倒计时 tick）不重放卡片入场动画
     appEl.classList.toggle('silent', animate === false);
-
     if (route.name === 'detail') Pages.detail.render(appEl, route.id);
     else if (route.name === 'about') Pages.about.render(appEl);
     else Pages[route.name].render(appEl);
-
     if (animate !== false) {
       appEl.classList.remove('page-enter');
-      void appEl.offsetWidth; // 重新触发动画
+      void appEl.offsetWidth;
       appEl.classList.add('page-enter');
     }
     updateTabbar(route);
     window.scrollTo(0, 0);
   }
-
-  /** 当前页面名（供各页面判断自己是否仍在显示中） */
   function currentPage() {
     return currentRoute ? currentRoute.name : parseHash().name;
   }
-
   /* ---------- 底部导航 ---------- */
   function updateTabbar(route) {
-    // 设置/关于等「我的」的子页面，保持「我的」标签高亮
     var subOfProfile = route.name === 'about' || route.name === 'settingsProfile' || route.name === 'settingsCooling' || route.name === 'settingsAccount';
     var tabs = document.querySelectorAll('#tabbar .tab');
     tabs.forEach(function (tab) {
@@ -66,30 +55,26 @@ window.App = (function () {
       tab.classList.toggle('active', r === route.name || (subOfProfile && r === 'profile'));
     });
   }
-
   function bindTabbar() {
     document.getElementById('tabbar').addEventListener('click', function (e) {
       var tab = e.target.closest('.tab');
       if (!tab) return;
       var r = tab.getAttribute('data-route');
-      if (r === parseHash().name) return; // 已在当前页
+      if (r === parseHash().name) return;
       location.hash = '#/' + r;
     });
   }
-
   /* ---------- 定时刷新倒计时与状态 ---------- */
   var tickTimer = null;
   function startTick() {
-    // 每 30 秒检查一次：倒计时文本更新、冷静期到期提醒出现
     tickTimer = setInterval(function () {
       if (document.hidden) return;
       var r = parseHash();
       if (r.name === 'items' || r.name === 'detail' || r.name === 'profile') {
-        render(false); // 静默刷新，不带入场动画
+        render(false);
       }
     }, 30000);
   }
-
   function init() {
     appEl = document.getElementById('app');
     Store.load();
@@ -98,8 +83,6 @@ window.App = (function () {
     startTick();
     render(true);
   }
-
-  // DOM 已就绪时直接启动（正常浏览器走 DOMContentLoaded 分支）
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {

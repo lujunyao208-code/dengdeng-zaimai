@@ -5,33 +5,30 @@
  * - Pages.settingsCooling 冷静期偏好（真实功能：宽松 / 标准 / 谨慎）
  * - Pages.settingsAccount 账号与安全（仅说明页，不做真实登录）
  *
+ * V2.0 变更：移除 AI 识别设置页（API Key 改由 Cloudflare Worker 管理，
+ *           用户无需配置任何东西）
+ *
  * 原则：不存在「看起来可以点击、实际不能用」的入口；
  * 没有真实能力的入口（如通知设置）直接删除。
  * ============================================================
  */
 window.Pages = window.Pages || {};
-
 /* ---------- 编辑资料（我的 → 编辑资料）：昵称 + 头像 ---------- */
 Pages.settingsProfile = (function () {
-
   function render(root) {
     root.innerHTML = '<div class="page"></div>';
     var page = root.firstChild;
     var user = Store.getUser();
-
-    var pendingImage = user.avatarImage; // dataURL 或 null（选推荐头像时清空）
+    var pendingImage = user.avatarImage;
     var pendingIcon = user.avatar;
-
     function previewHTML() {
       return '<div class="av-preview">' +
         (pendingImage ? '<img src="' + pendingImage + '" alt="头像预览">' : Icons.get(pendingIcon)) +
         '</div>';
     }
-
     var options = CONFIG.AVATARS.map(function (key) {
       return '<button class="avatar-opt' + (!pendingImage && pendingIcon === key ? ' selected' : '') + '" data-avatar="' + key + '"><span class="ico">' + Icons.get(key) + '</span></button>';
     }).join('');
-
     page.innerHTML =
       '<div class="detail-head">' +
         '<button class="back-btn" data-act="back">‹</button>' +
@@ -50,14 +47,12 @@ Pages.settingsProfile = (function () {
           '<button class="btn btn-main" data-act="save">保存</button>' +
         '</div>' +
       '</div>';
-
     function refreshPreview() {
       page.querySelector('.av-preview-wrap').innerHTML = previewHTML();
       page.querySelectorAll('.avatar-opt').forEach(function (o) {
         o.classList.toggle('selected', !pendingImage && o.getAttribute('data-avatar') === pendingIcon);
       });
     }
-
     var input = page.querySelector('#av-input');
     page.querySelector('[data-act="pick-file"]').addEventListener('click', function () {
       input.value = '';
@@ -94,8 +89,6 @@ Pages.settingsProfile = (function () {
       }
     });
   }
-
-  /** 图片居中裁剪为正方形并压缩（头像统一圆形显示，本地保存） */
   function squareCrop(dataUrl) {
     return new Promise(function (resolve, reject) {
       var img = new Image();
@@ -112,19 +105,14 @@ Pages.settingsProfile = (function () {
       img.src = dataUrl;
     });
   }
-
   return { render: render };
 })();
-
 /* ---------- 冷静期偏好 ---------- */
 Pages.settingsCooling = (function () {
-
   function render(root) {
     root.innerHTML = '<div class="page"></div>';
     var page = root.firstChild;
     var mode = Store.getUser().coolingMode || 'standard';
-
-    // 展示顺序：宽松 / 标准 / 谨慎（默认标准）
     var opts = ['relaxed', 'standard', 'cautious'].map(function (key) {
       var m = CONFIG.COOLING_MODES[key];
       return (
@@ -137,7 +125,6 @@ Pages.settingsCooling = (function () {
         '</button>'
       );
     }).join('');
-
     page.innerHTML =
       '<div class="detail-head">' +
         '<button class="back-btn" data-act="back">‹</button>' +
@@ -148,7 +135,6 @@ Pages.settingsCooling = (function () {
         opts +
       '</div>' +
       '<p class="set-foot">系统仍会按照商品情况计算冷静期，<br>你的偏好只是让结果整体更偏向宽松或谨慎。</p>';
-
     page.addEventListener('click', function (e) {
       if (e.target.closest('[data-act="back"]')) {
         location.hash = '#/profile';
@@ -161,13 +147,10 @@ Pages.settingsCooling = (function () {
       render(document.getElementById('app'));
     });
   }
-
   return { render: render };
 })();
-
 /* ---------- 账号与安全（说明页） ---------- */
 Pages.settingsAccount = (function () {
-
   function render(root) {
     root.innerHTML = '<div class="page"></div>';
     var page = root.firstChild;
@@ -184,11 +167,9 @@ Pages.settingsAccount = (function () {
         '</div>' +
       '</div>' +
       '<p class="set-foot">当前为体验版，账号数据暂保存在本地。</p>';
-
     page.addEventListener('click', function (e) {
       if (e.target.closest('[data-act="back"]')) location.hash = '#/profile';
     });
   }
-
   return { render: render };
 })();
